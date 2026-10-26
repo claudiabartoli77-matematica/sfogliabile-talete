@@ -33,10 +33,20 @@ const cfg={width:w,height:h,size:'stretch',minWidth:150,maxWidth:w,minHeight:Mat
 const nodes=images.map((src,i)=>{const div=document.createElement('div');div.className='page'+(style==='book'&&(i===0||i===images.length-1)?' hard':'');if(style==='book'&&(i===0||i===images.length-1))div.dataset.density='hard';const img=document.createElement('img');img.src=src;img.alt=`Pagina ${i+1}`;img.loading='eager';div.appendChild(img);return div});
 flip=new St.PageFlip($('flipbook'),cfg);flip.loadFromHtml(nodes);flip.on('flip',updateCount);flip.on('init',updateCount);flip.on('changeOrientation',updateCount);updateCount();message('Sfoglia trascinando la pagina oppure usando le frecce.');}
 async function init(){if(!window.pdfjsLib||!window.St?.PageFlip){setLoading(false);message('Impossibile caricare le librerie online. È necessaria una connessione Internet.',true);return}
-busy=true;try{pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';let pdf=await pdfjsLib.getDocument({url:PDF_FILE}).promise;const count=pdf.numPages;setLoading(true,`${count} pagine trovate…`,5);
+busy=true;try{pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';const requestUrl=new URL(PDF_FILE,location.href);requestUrl.searchParams.set('v','2');
+const response=await fetch(requestUrl,{cache:'no-store'});
+if(!response.ok)throw new Error(`HTTP ${response.status}: il PDF non è disponibile all’indirizzo ${requestUrl.pathname}.`);
+const buffer=await response.arrayBuffer();
+if(buffer.byteLength<100)throw new Error('Il file ricevuto è vuoto o troppo piccolo per essere un PDF.');
+const signature=new TextDecoder('ascii').decode(buffer.slice(0,16));
+if(!signature.startsWith('%PDF-')){
+ const hint=signature.trim().startsWith('<')?'Il sito ha restituito una pagina HTML invece del PDF. Controlla la cartella pubblicata e il percorso del file.':'Il file ricevuto non comincia con la firma %PDF-.';
+ throw new Error(hint+` Percorso richiesto: ${requestUrl.pathname}`);
+}
+let pdf=await pdfjsLib.getDocument({data:new Uint8Array(buffer)}).promise;const count=pdf.numPages;setLoading(true,`${count} pagine trovate…`,5);
 const first=await pdf.getPage(1);const v=first.getViewport({scale:1});pageRatio=v.height/v.width;
 for(let i=1;i<=count;i++){const page=i===1?first:await pdf.getPage(i);const vp=page.getViewport({scale:Math.min(2.3,1100/page.getViewport({scale:1}).width)});const canvas=document.createElement('canvas');canvas.width=Math.round(vp.width);canvas.height=Math.round(vp.height);await page.render({canvasContext:canvas.getContext('2d',{alpha:false}),viewport:vp}).promise;images.push(canvas.toDataURL('image/jpeg',.88));canvas.width=0;canvas.height=0;setLoading(true,`Preparazione pagina ${i} di ${count}`,Math.round(i/count*100));}
-setLoading(false);busy=false;mountFlip(0)}catch(err){console.error(err);setLoading(false);busy=false;message('Non riesco ad aprire documento.pdf. Verifica che il file sia nella stessa cartella di index.html e che il sito sia pubblicato su GitHub Pages o Cloudflare Pages. Dettagli: '+(err?.message||err),true)}}
+setLoading(false);busy=false;mountFlip(0)}catch(err){console.error(err);setLoading(false);busy=false;message('Errore apertura PDF: '+(err?.message||err),true)}}
 document.querySelectorAll('[data-style]').forEach(b=>b.addEventListener('click',()=>setStyle(b.dataset.style)));
 $('prev').addEventListener('click',()=>flip?.flipPrev('bottom'));$('next').addEventListener('click',()=>flip?.flipNext('bottom'));$('first').addEventListener('click',()=>flip?.flip(0,'bottom'));$('last').addEventListener('click',()=>flip?.flip(images.length-1,'bottom'));$('fullscreen').addEventListener('click',async()=>{if(!document.fullscreenElement)await document.documentElement.requestFullscreen?.();else await document.exitFullscreen?.()});
 document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')flip?.flipNext('bottom');if(e.key==='ArrowLeft')flip?.flipPrev('bottom')});init();
