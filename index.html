@@ -6,12 +6,20 @@
 <style>
 :root{--ink:#e9e8e3;--muted:#aab0c0;--accent:#eacb91;--panel:#222a3a;--line:#454e5c}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 55% 37%,#444856 0%,#202638 50%,#141926 100%);color:var(--ink);min-height:100vh;font:15px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif}.app{width:min(1320px,100%);min-height:100vh;margin:auto;display:flex;flex-direction:column}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:19px 28px 10px;flex-wrap:wrap}.brand{font-size:12px;letter-spacing:.25em;color:var(--accent);text-transform:uppercase}.top h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(24px,3vw,37px);margin:3px 0 0}.choices{display:flex;gap:6px;border:1px solid var(--line);padding:5px;background:#141b29bb;border-radius:14px}.choices button{border:0;border-radius:9px;background:transparent;color:#d0d4e0;padding:10px 15px;font-weight:600;cursor:pointer}.choices button.active{color:#1b2230;background:#ebcc96;box-shadow:0 2px 9px #0004}button:focus-visible{outline:3px solid #fff;outline-offset:2px}.subtitle{text-align:center;color:var(--muted);margin:4px 0 0;padding:0 18px;font-size:13px}.stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;min-height:510px;margin:0 16px;overflow:hidden}.stage:before{content:"";position:absolute;width:min(94%,1000px);height:70px;bottom:6%;border-radius:50%;background:#0008;filter:blur(30px)}#book-mount{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:100%;height:min(68vh,690px);filter:drop-shadow(6px 12px 17px #0008)}.page{background:#fcfaf6;overflow:hidden}.page img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}.page.hard{border:1px solid #d1c5ad}.notebook #book-mount:after{content:"";position:absolute;top:3%;bottom:3%;left:50%;width:16px;pointer-events:none;z-index:99;transform:translateX(-50%);background:repeating-linear-gradient(to bottom,transparent 0 9px,#b8c0c7 9px 13px,#5f6977 13px 15px,transparent 15px 27px);opacity:.78;filter:drop-shadow(2px 1px 1px #0007)}.magazine .page{filter:saturate(1.08)}.notebook .page{box-shadow:inset 5px 0 8px #b0afa344}.bar{padding:13px 23px 22px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}.bar button{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:10px 14px;min-width:46px;cursor:pointer}.bar button:hover{border-color:var(--accent)}.bar button:disabled{opacity:.35;cursor:default}.count{min-width:135px;text-align:center;font-variant-numeric:tabular-nums;color:#e1e0e0}.status{font-size:12px;color:var(--muted);text-align:center;padding:0 14px 12px;min-height:31px}.error{color:#ffd0c3}.pill{padding:9px 13px;background:#19213080;border:1px solid var(--line);border-radius:11px;color:#b9bfd0;font-size:12px}.loading{position:absolute;z-index:5;inset:15% 8%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-radius:20px;color:#fff;background:#151b29ee;gap:9px}.loading[hidden]{display:none}.loading strong{font-family:Georgia,serif;font-size:24px;font-weight:400}.loading span{color:var(--muted)}.loader{height:5px;width:180px;background:#3e4756;border-radius:10px;overflow:hidden;margin-top:14px}.loader b{display:block;height:100%;background:var(--accent);width:0;transition:width .2s}.hint{text-align:center;font-size:12px;color:#8a93a7;padding-bottom:9px}@media(max-width:700px){.top{padding:17px 12px 6px;justify-content:center;text-align:center}.top h1{font-size:25px}.choices{width:100%;justify-content:center}.choices button{flex:1;padding:10px 8px}.stage{min-height:380px;margin:0 4px}#book-mount{height:min(64vh,510px)}.bar{gap:6px;padding:8px}.bar button{padding:9px 11px}.pill{display:none}.notebook #book-mount:after{display:none}}
 
-.view-choices{align-self:center;margin:6px 12px 10px;width:auto}
 .stage{min-height:0;padding:12px 0;flex:1}
 #book-mount{flex:none}
 .notebook #book-mount.single-page:after{left:0;display:block}
 html:fullscreen,html:fullscreen body{min-height:100vh}
-@media(max-width:700px){.stage{min-height:0}.view-choices{width:auto}.bar{padding-bottom:12px}}
+@media(max-width:700px){.stage{min-height:0}.bar{padding-bottom:12px}}
+
+#exit-fullscreen{display:none;position:fixed;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));z-index:10000;width:44px;height:44px;border:1px solid #ffffff70;border-radius:50%;background:#111b;color:white;font:32px/1 system-ui;cursor:pointer;align-items:center;justify-content:center}
+html:fullscreen body{height:100vh;min-height:0;overflow:hidden;background:#141926}
+html:fullscreen .app{width:100vw;max-width:none;height:100vh;min-height:0;margin:0}
+html:fullscreen .top,html:fullscreen .bar,html:fullscreen .status,html:fullscreen .hint,html:fullscreen .loading{display:none!important}
+html:fullscreen .stage{width:100vw;height:100vh;min-height:0;flex:none;margin:0;padding:0;overflow:hidden}
+html:fullscreen .stage:before,html:fullscreen #book-mount:after{display:none}
+html:fullscreen #book-mount{filter:none}
+html:fullscreen #exit-fullscreen{display:flex}
 </style>
 </head>
 <body class="book"><div class="app">
@@ -19,10 +27,10 @@ html:fullscreen,html:fullscreen body{min-height:100vh}
 <!-- PERSONALIZZA QUI IL TITOLO DEL LIBRO -->
 <h1 id="book-title">Il mio sfogliabile</h1>
 </div><nav class="choices" aria-label="Scegli lo sfoglio"><button class="active" data-style="book" aria-pressed="true">📖 Libro</button><button data-style="magazine" aria-pressed="false">▤ Rivista</button><button data-style="notebook" aria-pressed="false">▦ Quaderno</button></nav></header>
-<nav class="choices view-choices" aria-label="Numero di pagine visibili"><button data-view="single" aria-pressed="false">Pagina singola</button><button class="active" data-view="double" aria-pressed="true">Doppia pagina</button></nav>
 <main class="stage"><div id="book-mount"><div id="flipbook"></div></div><div class="loading" id="loading" role="status"><strong>Prepariamo le pagine…</strong><span id="progress-label">Apertura del documento</span><div class="loader"><b id="progress"></b></div></div></main>
 <div class="bar"><button id="first" aria-label="Prima pagina" title="Prima pagina">⇤</button><button id="prev" aria-label="Pagina precedente" title="Indietro">←</button><span class="count" id="counter">Pagina —</span><button id="next" aria-label="Pagina successiva" title="Avanti">→</button><button id="last" aria-label="Ultima pagina" title="Ultima pagina">⇥</button><button id="fullscreen" title="Schermo intero" aria-pressed="false">⛶ Schermo intero</button><span class="pill">Trascina l'angolo di una pagina per sfogliarla</span></div><div class="status" id="status" aria-live="polite"></div><div class="hint">Sul telefono puoi sfogliare con il dito · Frecce della tastiera su PC</div>
 </div>
+<button id="exit-fullscreen" aria-label="Esci da schermo intero" title="Esci da schermo intero">×</button>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
 <script>
@@ -31,7 +39,7 @@ html:fullscreen,html:fullscreen body{min-height:100vh}
 const PDF_FILE='documento.pdf';
 const $=id=>document.getElementById(id);
 document.title=$('book-title').textContent;
-let view='double', resizeTimer;
+let resizeTimer;
 let flip=null, images=[], pageRatio=1.414, style='book', current=0, busy=false;
 const options={book:{flippingTime:1150,maxShadowOpacity:.55,showCover:true},magazine:{flippingTime:650,maxShadowOpacity:.28,showCover:true},notebook:{flippingTime:900,maxShadowOpacity:.34,showCover:true}};
 function message(msg,error=false){$('status').textContent=msg;$('status').classList.toggle('error',error)}
@@ -40,9 +48,10 @@ function updateCount(){if(!flip)return;current=flip.getCurrentPageIndex();$('cou
 function setStyle(next){if(busy)return;style=next;document.body.className=next;document.querySelectorAll('[data-style]').forEach(b=>{const active=b.dataset.style===next;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});if(images.length)mountFlip(current)}
 function mountFlip(pageIndex=0){if(!window.St?.PageFlip){message('La libreria di sfoglio non è disponibile. Verifica la connessione Internet.',true);return}if(flip){try{flip.destroy()}catch(e){console.warn(e)}flip=null}const mount=$('book-mount');mount.innerHTML='<div id="flipbook"></div>';
 const app=document.querySelector('.app');
-const spare=app.querySelector('.top').offsetHeight+app.querySelector('.view-choices').offsetHeight+app.querySelector('.bar').offsetHeight+70;
-const availableW=Math.max(160,document.querySelector('.stage').clientWidth-16);
-const single=view==='single'||availableW<700;
+const full=!!document.fullscreenElement;
+const spare=full?0:app.querySelector('.top').offsetHeight+app.querySelector('.bar').offsetHeight+70;
+const availableW=Math.max(160,full?window.innerWidth:document.querySelector('.stage').clientWidth-16);
+const single=availableW<700;
 const h=Math.max(100,Math.floor(Math.min(window.innerHeight-spare,availableW*pageRatio/(single?1:2))));
 const w=Math.floor(h/pageRatio);
 mount.style.width=(single?w:w*2)+'px';mount.style.height=h+'px';
@@ -72,10 +81,10 @@ else if(document.documentElement.requestFullscreen)await document.documentElemen
 else message('Schermo intero non supportato da questo browser.',true);
 }catch(e){message('Il browser non consente lo schermo intero in questa finestra.',true);}
 });
+$('exit-fullscreen').addEventListener('click',async()=>{if(document.fullscreenElement){try{await document.exitFullscreen()}catch(e){console.warn(e)}}});
 function resizeBook(){clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if(images.length&&!busy)mountFlip(current)},180)}
 window.addEventListener('resize',resizeBook);
-document.addEventListener('fullscreenchange',()=>{const active=!!document.fullscreenElement;$('fullscreen').textContent=active?'⛶ Esci da schermo intero':'⛶ Schermo intero';$('fullscreen').setAttribute('aria-pressed',String(active));resizeBook()});
-document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{view=b.dataset.view;document.querySelectorAll('[data-view]').forEach(x=>{const active=x.dataset.view===view;x.classList.toggle('active',active);x.setAttribute('aria-pressed',String(active))});if(images.length&&!busy)mountFlip(current)}));
+document.addEventListener('fullscreenchange',()=>{const active=!!document.fullscreenElement;$('fullscreen').textContent=active?'⛶ Esci da schermo intero':'⛶ Schermo intero';$('fullscreen').setAttribute('aria-pressed',String(active));if(images.length&&!busy)mountFlip(current);resizeBook();(active?$('exit-fullscreen'):$('fullscreen')).focus()});
 document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')flip?.flipNext('bottom');if(e.key==='ArrowLeft')flip?.flipPrev('bottom')});init();
 </script>
 </body></html>
